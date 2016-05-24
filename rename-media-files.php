@@ -132,6 +132,10 @@ function rename_media_files_attachment_fields_to_save( $post, $attachment ) {
 		$orig_file = get_attached_file( $post['ID'] );
 		$orig_filename = basename( $orig_file );
 
+		// get original extension in order to add later (if user forgets)
+		$extension = str_replace( 'jpeg', 'jpg', pathinfo( basename( $orig_file ), PATHINFO_EXTENSION ) );
+		$extension = '.' . $extension;
+
 		/* Get original path of file */
 		$orig_dir_path = substr( $orig_file, 0, ( strrpos( $orig_file, "/" ) ) );
 
@@ -152,8 +156,9 @@ function rename_media_files_attachment_fields_to_save( $post, $attachment ) {
 		}
 
 		/* Make new filename and path */
-		$new_filename= wp_unique_filename( $orig_dir_path, $attachment['rename_media_files_input'] );
-		$new_file = $orig_dir_path . "/" . $new_filename;
+		$new_filename = wp_unique_filename( $orig_dir_path, str_replace( $extension, '', $attachment['rename_media_files_input'] ) );
+		$new_filename = strtolower( $new_filename );
+		$new_file = $orig_dir_path . "/" . $new_filename . $extension;
 
 		/* Make new file with desired name */
 		copy( $orig_file, $new_file );
